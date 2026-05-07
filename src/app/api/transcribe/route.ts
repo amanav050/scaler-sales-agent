@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     });
     
     console.log('✅ Transcription completed successfully');
-    console.log('📝 Transcript length:', transcription.length);
+    console.log('📝 Transcript length:', String(transcription).length);
     
     return Response.json({ transcript: transcription });
     
