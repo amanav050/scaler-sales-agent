@@ -65,18 +65,8 @@ export default function AudioUploader({
     try {
       const formData = new FormData();
       formData.append('audio', file);
-
-      const response = await fetch('/api/transcribe', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to transcribe audio');
-      }
-
-      const data = await response.json();
+      const res = await fetch('/api/transcribe', { method: 'POST', body: formData });
+      const data = await res.json();
       onTranscriptComplete(data.transcript);
     } catch (err) {
       onError(err instanceof Error ? err.message : 'Failed to transcribe audio');
