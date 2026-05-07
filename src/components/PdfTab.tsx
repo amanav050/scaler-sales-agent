@@ -10,72 +10,75 @@ import { LeadProfile } from '../lib/types';
 export default function PdfTab() {
   const [leadProfile, setLeadProfile] = useState<LeadProfile | null>(null);
   const [transcript, setTranscript] = useState('');
-  const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState<string>('');
+  const [status, setStatus] = useState('');
+  const [pdfData, setPdfData] = useState<string | null>(null);
+  const [showApproval, setShowApproval] = useState(false);
 
   const handleLeadProfileChange = (profile: LeadProfile) => {
     setLeadProfile(profile);
-    setError(null);
+    setError('');
   };
 
   const handleTranscriptChange = (text: string) => {
     setTranscript(text);
-    setError(null);
+    setError('');
   };
 
   const handleGeneratePdf = async () => {
-    if (!leadProfile || !transcript.trim()) {
-      setError('Please provide lead profile and transcript first');
-      return;
-    }
-
-    setIsGenerating(true);
-    setError(null);
-    setPdfBase64(null);
-
     try {
-      // Step 1: Extract questions
-      setCurrentStep('Extracting questions from transcript...');
-      const questionsResponse = await fetch('/api/extract-questions', {
+      setStatus('Extracting questions...');
+      setError('');
+      
+      const extractRes = await fetch('/api/extract-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript }),
+        body: JSON.stringify({ transcript })
       });
       
-      if (!questionsResponse.ok) throw new Error('Failed to extract questions');
-      const { questions } = await questionsResponse.json();
-
-      // Step 2: Generate PDF content
-      setCurrentStep('Generating personalized PDF content...');
-      const contentResponse = await fetch('/api/generate-pdf-content', {
+      if (!extractRes.ok) {
+        const err = await extractRes.json();
+        throw new Error(err.error || 'Failed to extract questions');
+      }
+      
+      const { questions } = await extractRes.json();
+      setStatus('Generating content...');
+      
+      const contentRes = await fetch('/api/generate-pdf-content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadProfile, openQuestions: questions }),
+        body: JSON.stringify({ leadProfile, openQuestions: questions })
       });
       
-      if (!contentResponse.ok) throw new Error('Failed to generate PDF content');
-      const pdfContent = await contentResponse.json();
-
-      // Step 3: Generate PDF
-      setCurrentStep('Creating PDF document...');
-      const pdfResponse = await fetch('/api/generate-pdf', {
+      if (!contentRes.ok) {
+        const err = await contentRes.json();
+        throw new Error(err.error || 'Failed to generate content');
+      }
+      
+      const pdfContent = await contentRes.json();
+      setStatus('Creating PDF...');
+      
+      const pdfRes = await fetch('/api/generate-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pdfContent }),
+        body: JSON.stringify(pdfContent)
       });
       
-      if (!pdfResponse.ok) throw new Error('Failed to generate PDF');
-      const { pdf } = await pdfResponse.json();
-
-      setPdfBase64(pdf);
-      setCurrentStep('PDF generated successfully!');
-      setTimeout(() => setCurrentStep(''), 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate PDF');
-    } finally {
-      setIsGenerating(false);
+      if (!pdfRes.ok) {
+        const err = await pdfRes.json();
+        throw new Error(err.error || 'Failed to generate PDF');
+      }
+      
+      const { pdfBase64 } = await pdfRes.json();
+      setPdfData(pdfBase64);
+      setStatus('Done');
+      setShowApproval(true);
+      
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+      setStatus('');
     }
   };
 
@@ -161,7 +164,7 @@ export default function PdfTab() {
       </div>
 
       {/* Generate Button */}
-      {leadProfile && transcript.trim() && (
+      {transcript.trim() && (
         <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 relative z-10">
           <button
             onClick={handleGeneratePdf}
@@ -174,18 +177,18 @@ export default function PdfTab() {
       )}
 
       {/* PDF Preview */}
-      {pdfBase64 && (
+      {pdfData && (
         <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 relative z-10">
           <h3 className="text-lg font-semibold mb-4 text-white">PDF Preview</h3>
           <PdfPreview
-            pdfBase64={pdfBase64}
+            pdfBase64={pdfData}
             filename={`scaler-pdf-${leadProfile?.name || 'lead'}.pdf`}
           />
         </div>
       )}
 
       {/* Approval Gate */}
-      {pdfBase64 && leadProfile && (
+      {pdfData && leadProfile && (
         <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 relative z-10">
           <h3 className="text-lg font-semibold mb-4 text-white">Send to Lead</h3>
           <ApprovalGate
