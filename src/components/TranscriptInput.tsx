@@ -16,6 +16,7 @@ export default function TranscriptInput({
 }: TranscriptInputProps) {
   const [inputMode, setInputMode] = useState<'text' | 'audio'>('text');
   const [transcript, setTranscript] = useState('');
+  const [isTranscribingLocal, setIsTranscribingLocal] = useState(false);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -86,8 +87,8 @@ export default function TranscriptInput({
           <AudioUploader
             onTranscriptComplete={handleAudioTranscriptComplete}
             onError={handleAudioError}
-            isTranscribing={isTranscribing}
-            setIsTranscribing={() => {}}
+            isTranscribing={isTranscribingLocal}
+            setIsTranscribing={setIsTranscribingLocal}
           />
         </div>
       )}
