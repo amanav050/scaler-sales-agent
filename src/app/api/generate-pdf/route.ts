@@ -40,29 +40,29 @@ export async function POST(request: NextRequest) {
     console.log('📄 Creating cover page...');
     
     // Add background
-    doc.setFillColor(...colors.background);
+    doc.setFillColor(colors.background[0], colors.background[1], colors.background[2]);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
     
     // Scaler logo area (text-based)
-    doc.setTextColor(...colors.primary);
+    doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(32);
     doc.text('SCALER', pageWidth / 2, 60, { align: 'center' });
     
     // Subtitle
-    doc.setTextColor(...colors.muted);
+    doc.setTextColor(colors.muted[0], colors.muted[1], colors.muted[2]);
     doc.setFont('Helvetica', 'normal');
     doc.setFontSize(14);
     doc.text('Transform Your Engineering Career', pageWidth / 2, 75, { align: 'center' });
     
     // Lead name
-    doc.setTextColor(...colors.text);
+    doc.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(24);
     doc.text(pdfContent.lead_name || 'Hello', pageWidth / 2, 120, { align: 'center' });
     
     // Personalized headline
-    doc.setTextColor(...colors.secondary);
+    doc.setTextColor(colors.secondary[0], colors.secondary[1], colors.secondary[2]);
     doc.setFont('Helvetica', 'normal');
     doc.setFontSize(16);
     const headlineLines = doc.splitTextToSize(pdfContent.headline || 'Your Path to Excellence', contentWidth * 0.8);
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Date
-    doc.setTextColor(...colors.muted);
+    doc.setTextColor(colors.muted[0], colors.muted[1], colors.muted[2]);
     doc.setFont('Helvetica', 'normal');
     doc.setFontSize(12);
     const today = new Date().toLocaleDateString('en-US', { 
@@ -105,14 +105,14 @@ export async function POST(request: NextRequest) {
         }
         
         // Section heading
-        doc.setTextColor(...colors.primary);
+        doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(16);
         doc.text(section.heading || 'Information', margin, yPosition);
         yPosition += 15;
         
         // Section body
-        doc.setTextColor(...colors.text);
+        doc.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(11);
         const bodyLines = doc.splitTextToSize(section.body || '', contentWidth);
@@ -131,8 +131,8 @@ export async function POST(request: NextRequest) {
           yPosition += 10;
           
           // Draw colored box
-          doc.setFillColor(...colors.accent);
-          doc.setDrawColor(...colors.accent);
+          doc.setFillColor(colors.accent[0], colors.accent[1], colors.accent[2]);
+          doc.setDrawColor(colors.accent[0], colors.accent[1], colors.accent[2]);
           doc.roundedRect(margin, yPosition - 5, contentWidth, 25, 3, 3, 'FD');
           
           // Add stat text in white
@@ -142,12 +142,12 @@ export async function POST(request: NextRequest) {
           doc.text(section.key_stat, margin + 10, yPosition + 12);
           
           yPosition += 35;
-          doc.setTextColor(...colors.text);
+          doc.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
         }
         
         // Add visual divider
         if (i < pdfContent.sections.length - 1) {
-          doc.setDrawColor(...colors.muted);
+          doc.setDrawColor(colors.muted[0], colors.muted[1], colors.muted[2]);
           doc.setLineWidth(0.5);
           doc.line(margin, yPosition, pageWidth - margin, yPosition);
           yPosition += 20;
@@ -164,13 +164,13 @@ export async function POST(request: NextRequest) {
       }
       
       // Add divider before final section
-      doc.setDrawColor(...colors.primary);
+      doc.setDrawColor(colors.primary[0], colors.primary[1], colors.primary[2]);
       doc.setLineWidth(1);
       doc.line(margin, yPosition, pageWidth - margin, yPosition);
       yPosition += 25;
       
       // Personal note
-      doc.setTextColor(...colors.text);
+      doc.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
       doc.setFont('Helvetica', 'italic');
       doc.setFontSize(12);
       const personalNoteLines = doc.splitTextToSize(pdfContent.personal_note || '', contentWidth);
@@ -186,8 +186,8 @@ export async function POST(request: NextRequest) {
       
       // CTA Button (visual representation)
       yPosition += 15;
-      doc.setFillColor(...colors.primary);
-      doc.setDrawColor(...colors.primary);
+      doc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      doc.setDrawColor(colors.primary[0], colors.primary[1], colors.primary[2]);
       doc.roundedRect(margin, yPosition, contentWidth, 20, 5, 5, 'FD');
       
       // CTA text
