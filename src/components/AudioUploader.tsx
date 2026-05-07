@@ -46,7 +46,7 @@ export default function AudioUploader({
 
   const handleFile = async (file: File) => {
     // Validate file type
-    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/m4a', 'audio/mp3', 'audio/x-m4a'];
+    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/m4a', 'audio/mp3', 'audio/x-m4a', 'video/mp4', 'video/webm'];
     if (!allowedTypes.includes(file.type)) {
       onError('Invalid file type. Please upload MP3, WAV, or M4A files only.');
       return;
@@ -120,7 +120,7 @@ export default function AudioUploader({
                 </span>
                 <input
                   type="file"
-                  accept="audio/*"
+                  accept="audio/*,video/mp4,video/webm"
                   onChange={handleFileInput}
                   className="hidden"
                   disabled={isTranscribing}
@@ -128,7 +128,7 @@ export default function AudioUploader({
               </label>
             </div>
             <div className="text-xs space-y-1 text-gray-400">
-              <p>• Supports MP3, WAV, M4A formats</p>
+              <p>• Supports MP3, WAV, M4A, MP4, WEBM formats</p>
               <p>• Maximum file size: 25MB</p>
               <p>• English language only</p>
             </div>
